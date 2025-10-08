@@ -1,11 +1,10 @@
 import { ArrowDown } from "lucide-react";
-import heroBg from "../assets/hero-bg.jpeg";
+import heroBg from "../assets/hero.jpeg";
 
 const Hero = () => {
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
-
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div 
