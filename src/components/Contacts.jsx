@@ -11,8 +11,8 @@ const Contacts = () => {
     {
       icon: Linkedin,
       label: "LinkedIn",
-      value: "linkedin.com/in/christopherchege",
-      href: "https://linkedin.com/in/christopherchege"
+      value: "linkedin.com/in/dev-chris-chege",
+      href: "https://linkedin.com/in/dev-chris-chege"
     },
     {
       icon: Github,
