@@ -13,5 +13,6 @@ export const scrollToId = (id) => {
   return true;
 };
 
-// Copy that still starts with "TODO" (or is empty) is unfinished.
-export const isTodo = (text) => !text || /^\s*TODO/i.test(text);
+// Copy that contains a "TODO" marker (or is empty) is unfinished.
+// Case-sensitive on purpose, so ordinary words like "to-do" never trigger it.
+export const isTodo = (text) => !text || /\bTODO\b/.test(text);

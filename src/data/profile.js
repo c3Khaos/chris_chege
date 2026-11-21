@@ -1,7 +1,14 @@
 // Single source of truth. Components render this; they never hardcode content.
-// Search this file for "TODO" to find everything that still needs your own words.
-// Anything that starts with "TODO" renders with a visible amber badge on the site,
-// so you cannot ship it by accident.
+//
+// Unfinished copy contains a "TODO:" marker. Everything before the marker renders
+// as normal copy; the marker and what follows render as an amber-badged prompt.
+// In dev, the console also tells you what's left (see the bottom of this file).
+//
+// Conventions:
+//   - Absent optional fields are `null`, never "" (repo, live, image).
+//   - A null repo/live simply hides that button. A wrong link is worse than no link.
+//   - `private: true` (with a null repo) shows "Private repo: ask for a walkthrough".
+//   - A project's `stack` strings must match a skill in `skillGroups` exactly.
 
 export const profile = {
   name: "Christopher Chege",
@@ -9,9 +16,9 @@ export const profile = {
   role: "Full-stack developer",
   tagline: "I build full-stack web apps with React and Flask.",
   intro:
-    "Four projects below, each with the decisions behind it, not just a screenshot. Or skip the scroll and talk to the terminal.",
+    "A real client in Nairobi uses the POS I built. Each project below comes with the decisions behind it, not just a screenshot. Or skip the scroll and talk to the terminal.",
   aboutIntro:
-    "I'm Christopher, a full-stack developer working in React and Python (Flask). The short version of how I got here is below, in three parts.",
+    "I'm Christopher, a full-stack developer working in React and Python (Flask). The short version of how I got here is below.",
   email: "d3v.chris@gmail.com",
   links: {
     github: "https://github.com/c3Khaos",
@@ -29,30 +36,30 @@ export const sections = [
   { id: "contact", label: "Contact" },
 ];
 
-// Your story. Specific beats impressive. Replace every TODO.
+// Your story. Specific beats impressive.
 export const story = [
   {
     id: "first",
     label: "First build",
     title: "The first thing I built",
-    body: "TODO: What was it, when, and why that thing? Name the tool and the year. Two sentences, no adjectives.",
+    body: "The first thing I built was a point-of-sale system for Kenyan SMEs, starting in early 2025. TODO: Why that one? What did you see at the client's shop that made you build it?",
   },
   {
     id: "broke",
     label: "What broke",
     title: "The thing that broke",
-    body: "TODO: One real failure: a bug that ate a day, a deploy that died, a design you had to throw away. What was it?",
+    body: "My failure was integrating payments: connecting the POS to Safaricom (STK push and C2B) and Kopo Kopo merchants. On localhost I used ngrok to expose my callback URL, and at one point I got duplicate payments. I fixed it by giving every sale a unique random UUID. TODO: Why did the duplicate happen? (Did the same callback arrive twice? A retry? A double tap?) Say what you found, not what you guessed.",
   },
   {
     id: "learned",
     label: "What I learned",
     title: "What it changed",
-    body: "TODO: How does that failure change the way you work now? Be specific enough that only you could have written it.",
+    body: "Automating the process made things easier and left less room for mistakes. TODO: Make it concrete. What did people do by hand before (the book records?) that is now automatic, and which mistake can no longer happen?",
   },
 ];
 
-// A skill is only "proven" if a project's `stack` contains the exact same string.
-// Skills with zero matching projects render as dashed (learning, not shipped).
+// A skill is "proven" only if a project's `stack` contains the exact same string.
+// Skills with zero matching projects render dashed (learning, not shipped).
 export const skillGroups = [
   {
     title: "Frontend",
@@ -60,7 +67,14 @@ export const skillGroups = [
   },
   {
     title: "Backend & data",
-    skills: ["Python", "Flask-RESTful", "SQLAlchemy", "REST APIs", "PostgreSQL"],
+    skills: [
+      "Python",
+      "Flask-RESTful",
+      "SQLAlchemy",
+      "REST APIs",
+      "Payment integrations",
+      "PostgreSQL",
+    ],
   },
   {
     title: "Tooling & design",
@@ -70,28 +84,53 @@ export const skillGroups = [
 
 export const knownSkills = skillGroups.flatMap((g) => g.skills);
 
+// The React + Flask stack shared by the store and the POS.
+const WEB_APP_STACK = [
+  "React",
+  "JavaScript",
+  "Tailwind CSS",
+  "Python",
+  "Flask-RESTful",
+  "SQLAlchemy",
+  "REST APIs",
+  "Git",
+];
+
 // Case study fields: problem, decision, tradeoff, result.
-// `image`: drop a screenshot in /public/projects/ and set e.g. "/projects/pos.png".
-// `live`: leave "" until there is a deployed URL; the button simply won't render.
+// image: put a screenshot in /public/projects/ and set e.g. "/projects/pos.png".
+// Order = order on the page. Lead with your strongest work.
 export const projects = [
+  {
+    id: "pos",
+    title: "POS for Kenyan SMEs",
+    monogram: "POS",
+    summary:
+      "SaaS point of sale for Kenyan SMEs: sales, stock, profit tracking, and payment integrations with Safaricom (STK push and C2B) and Kopo Kopo merchants.",
+    stack: [...WEB_APP_STACK, "Payment integrations"],
+    repo: null,
+    private: true, // code is private: card shows "Private repo: ask for a walkthrough"
+    live: null,
+    image: null,
+    caseStudy: {
+      problem:
+        "Before the POS, the client kept their records in books. TODO: What was failing for them? (Lost pages? Wrong profit? Hours spent adding up at night?)",
+      decision:
+        "Every sale gets a unique random UUID, added after I got duplicate payments. TODO: How does the UUID stop a duplicate? (Is it the reference sent with the payment request, and does your callback check it?) And is profit computed on write or on read, and why?",
+      tradeoff:
+        "TODO: What did you give up? (Offline mode? Multiple shops? Refunds?) Name it plainly.",
+      result:
+        "In use by a real client in Nairobi, replacing their book records. Development started in early 2025. TODO: What number backs it? (Sales per day, products tracked, hours saved.)",
+    },
+  },
   {
     id: "ecommerce",
     title: "E-Commerce Platform",
     monogram: "EC",
     summary:
       "Storefront with checkout and product management, backed by a Flask REST API.",
-    stack: [
-      "React",
-      "JavaScript",
-      "Tailwind CSS",
-      "Python",
-      "Flask-RESTful",
-      "SQLAlchemy",
-      "REST APIs",
-      "Git",
-    ],
-    repo: "https://github.com/c3Khaos", // TODO: link the actual repo
-    live: "",
+    stack: [...WEB_APP_STACK],
+    repo: null,
+    live: null,
     image: null,
     caseStudy: {
       problem:
@@ -105,54 +144,24 @@ export const projects = [
     },
   },
   {
-    id: "pos",
-    title: "Point of Sale (POS) System",
-    monogram: "POS",
-    summary:
-      "Point of sale for a retail shop: record sales, track stock, and see daily profit on a dashboard.",
-    stack: [
-      "React",
-      "JavaScript",
-      "Tailwind CSS",
-      "Python",
-      "Flask-RESTful",
-      "SQLAlchemy",
-      "REST APIs",
-      "Git",
-    ],
-    repo: "https://github.com/c3Khaos", // TODO: link the actual repo
-    live: "",
-    image: null,
-    caseStudy: {
-      problem:
-        "Retail shops often track sales, stock and profit in separate places. This puts them behind one login and one dashboard.",
-      decision:
-        "TODO: The decision that shaped this project. (How did you model stock vs sales? Is profit computed on write or on read, and why?)",
-      tradeoff:
-        "TODO: What did you give up? (Offline mode? Multiple shops? Refunds?) Name it plainly.",
-      result:
-        "TODO: One number or one outcome. Did a real shop use it? What broke when they did?",
-    },
-  },
-  {
     id: "school-cli",
     title: "School Management CLI",
     monogram: "CLI",
     summary:
       "Command-line school manager: register students, record grades, persist everything with the SQLAlchemy ORM.",
     stack: ["Python", "SQLAlchemy", "Git"],
-    repo: "https://github.com/c3Khaos", // TODO: link the actual repo
-    live: "",
+    repo: null,
+    live: null,
     image: null,
     caseStudy: {
       problem:
-        "TODO: What was the actual problem? (Who needed to manage students, and what did they use before?)",
+        "Built as a school project. TODO: What did the assignment ask for, and what did you add yourself?",
       decision:
         "SQLAlchemy ORM for persistence, driven entirely from the command line: no web layer to hide behind.",
       tradeoff:
         "TODO: What did a CLI cost you compared to a web UI, and why was it still the right call?",
       result:
-        "TODO: What does it handle today, and what is the first thing you'd fix?",
+        "It lives on GitHub as a learning project and taught me more about Python, including its environments and variables. TODO: Name two concepts that actually stuck, in plain words.",
     },
   },
   {
@@ -162,8 +171,8 @@ export const projects = [
     summary:
       "This site. A terminal that navigates it, skills that filter the projects, and a case study behind every card.",
     stack: ["React", "JavaScript", "Tailwind CSS", "Responsive Design", "Git"],
-    repo: "https://github.com/c3Khaos", // TODO: link the actual repo
-    live: "",
+    repo: null,
+    live: null,
     image: null,
     caseStudy: {
       problem:
@@ -180,3 +189,27 @@ export const projects = [
 
 export const projectsUsing = (skill) =>
   projects.filter((p) => p.stack.includes(skill));
+
+// ---------------------------------------------------------------------------
+// Guards. These only talk to the console; they never break the page.
+// ---------------------------------------------------------------------------
+
+// A typo in a stack entry silently breaks proof counts and filters, so always warn.
+const unknownTech = projects.flatMap((p) =>
+  p.stack.filter((s) => !knownSkills.includes(s)).map((s) => `${p.id}: "${s}"`)
+);
+if (unknownTech.length) {
+  console.warn("[profile] stack entries missing from skillGroups:", unknownTech);
+}
+
+// Dev-only reminders of what's still unfinished.
+if (import.meta.env?.DEV) {
+  const unfinished = [
+    ...story.map((s) => s.body),
+    ...projects.flatMap((p) => Object.values(p.caseStudy)),
+  ].filter((text) => /\bTODO\b/.test(text)).length;
+  const noRepo = projects.filter((p) => !p.repo && !p.private).map((p) => p.id);
+
+  if (unfinished) console.info(`[profile] ${unfinished} TODO field(s) left to write.`);
+  if (noRepo.length) console.info(`[profile] no repo link yet: ${noRepo.join(", ")}`);
+}
