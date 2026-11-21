@@ -33,19 +33,32 @@ const Navigation = ({ active }) => {
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  const linkClass = (id) =>
-    `font-medium transition-colors hover:text-accent ${
-      active === id ? "text-accent" : "text-foreground"
+  // Desktop link: dim by default, bright + accent underline when its section is in view.
+  const desktopLink = (id) =>
+    `relative inline-block py-1 font-medium transition-colors hover:text-white after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:rounded after:bg-accent after:transition-opacity motion-reduce:transition-none ${
+      active === id ? "text-white after:opacity-100" : "text-white/70 after:opacity-0"
+    }`;
+
+  // Mobile link: full-width 48px tap target with an accent bar on the active row.
+  const mobileLink = (id) =>
+    `flex min-h-12 items-center border-l-2 px-3 text-base font-medium transition-colors motion-reduce:transition-none ${
+      active === id
+        ? "border-accent bg-white/5 text-white"
+        : "border-transparent text-white/70 hover:bg-white/5 hover:text-white"
     }`;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/85 backdrop-blur">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 border-b border-white/10 text-white backdrop-blur-md transition-colors motion-reduce:transition-none ${
+        menuOpen ? "bg-primary shadow-xl" : "bg-primary/95"
+      }`}
+    >
       <nav aria-label="Primary" className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <a
             href="#hero"
             aria-label="Back to top"
-            className="font-display text-2xl font-bold text-foreground transition-colors hover:text-accent"
+            className="rounded font-display text-2xl font-bold text-white transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {profile.initials}
           </a>
@@ -56,7 +69,7 @@ const Navigation = ({ active }) => {
                 <a
                   href={`#${s.id}`}
                   aria-current={active === s.id ? "true" : undefined}
-                  className={linkClass(s.id)}
+                  className={desktopLink(s.id)}
                 >
                   {s.label}
                 </a>
@@ -66,7 +79,7 @@ const Navigation = ({ active }) => {
 
           <button
             type="button"
-            className="rounded-md p-2 transition-colors hover:bg-accent/10 md:hidden"
+            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-md text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
@@ -77,14 +90,14 @@ const Navigation = ({ active }) => {
         </div>
 
         {menuOpen && (
-          <ul id="mobile-menu" className="border-t border-border py-2 md:hidden">
+          <ul id="mobile-menu" className="border-t border-white/10 py-2 md:hidden">
             {sections.map((s) => (
               <li key={s.id}>
                 <a
                   href={`#${s.id}`}
                   onClick={() => setMenuOpen(false)}
                   aria-current={active === s.id ? "true" : undefined}
-                  className={`block py-3 ${linkClass(s.id)}`}
+                  className={mobileLink(s.id)}
                 >
                   {s.label}
                 </a>
