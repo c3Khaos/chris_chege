@@ -1,26 +1,29 @@
-import React from "react";
+import { Download } from "lucide-react";
+import Reveal from "./Reveal";
+import Button from "./Button";
+import { profile } from "../data/profile";
 
-function Resume() {
-  return (
-    <div className="flex justify-center items-center  space-x-6">
-      <a
-        href="/chris_Resume.pdf"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-      >
-        Preview Resume
-      </a>
-
-      <a
-        href="/chris_Resume.pdf"
-        download="Chege_Resume.pdf"
-        className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
-      >
-        Download Resume
-      </a>
+const Resume = () => (
+  <section id="resume" className="bg-background py-20">
+    <div className="container mx-auto px-4">
+      <Reveal className="mx-auto max-w-2xl text-center">
+        <h2 className="mb-4 font-display text-4xl font-bold text-foreground md:text-5xl">
+          Resume
+        </h2>
+        <p className="mb-8 text-lg text-muted-foreground">
+          The short version of everything on this page.
+        </p>
+        <Button
+          as="a"
+          href={profile.resume.href}
+          download={profile.resume.filename}
+        >
+          <Download className="h-5 w-5" aria-hidden="true" />
+          Download PDF
+        </Button>
+      </Reveal>
     </div>
-  );
-}
+  </section>
+);
 
 export default Resume;

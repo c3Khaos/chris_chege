@@ -1,56 +1,42 @@
-import { ArrowDown } from "lucide-react";
-import heroBg from "../assets/hero.jpeg";
+import Button from "./Button";
+import Terminal from "./Terminal";
+import { profile } from "../data/profile";
 
-const Hero = () => {
-  const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-  return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url(${heroBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/95 to-primary/80" />
-      </div>
-      
-      <div className="container relative z-10 px-4 py-32 mx-auto text-center">
-        <div className="animate-fade-in">
-          <p className="text-accent text-lg font-medium mb-4 tracking-wide uppercase">
-            Welcome to my portfolio
-          </p>
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 text-white">
-            Christopher Chege
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto font-light">
-            Creative Developer & Designer crafting beautiful digital experiences
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button 
-              onClick={() => scrollToSection("projects")}
-              className="min-w-[200px] px-8 py-3 bg-accent text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-            >
-              View My Work
-            </button>
-            <button 
-              onClick={() => scrollToSection("contact")}
-              className="min-w-[200px] px-8 py-3 bg-white/10 text-white border border-white/30 font-semibold rounded-lg hover:bg-white/20 transition-all duration-300"
-            >
-              Get In Touch
-            </button>
-          </div>
-        </div>
-        
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ArrowDown className="w-6 h-6 text-white/70" />
+const Hero = ({ onGoto, onFilter, onOpen }) => (
+  <section id="hero" className="relative isolate overflow-hidden bg-primary text-white">
+    <div className="bg-grid absolute inset-0 -z-10" aria-hidden="true" />
+
+    <div className="container mx-auto grid min-h-screen items-center gap-12 px-4 pb-20 pt-28 lg:grid-cols-2">
+      <div className="animate-fade-in motion-reduce:animate-none">
+        <p className="mb-4 font-mono text-sm tracking-wide text-accent">
+          {profile.role.toLowerCase()}
+        </p>
+        <h1 className="mb-6 font-display text-5xl font-bold md:text-6xl">
+          {profile.name}
+        </h1>
+        <p className="mb-4 max-w-xl text-xl font-light text-white/90 md:text-2xl">
+          {profile.tagline}
+        </p>
+        <p className="mb-8 max-w-xl text-white/70">{profile.intro}</p>
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <Button as="a" href="#projects">
+            See the projects
+          </Button>
+          <Button as="a" href="#contact" variant="ghost">
+            Get in touch
+          </Button>
         </div>
       </div>
-    </section>
-  );
-};
+
+      <div>
+        <Terminal onGoto={onGoto} onFilter={onFilter} onOpen={onOpen} />
+        <p className="mt-3 text-center font-mono text-xs text-white/50">
+          Real terminal behaviour: Tab completes, Up recalls. Try{" "}
+          <code className="text-accent">sudo hire me</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+);
 
 export default Hero;

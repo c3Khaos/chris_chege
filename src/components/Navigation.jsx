@@ -1,84 +1,105 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { profile, sections } from "../data/profile";
 
-const Navigation = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+const Navigation = ({ active }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [progress, setProgress] = useState(0);
 
+  // Scroll progress bar. rAF-throttled and passive so it never blocks scrolling.
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(max > 0 ? Math.min(window.scrollY / max, 1) : 0);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
-  const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setIsMobileMenuOpen(false);
-  };
+  // Escape closes the mobile menu.
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onKey = (e) => e.key === "Escape" && setMenuOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
-  const navItems = [
-    { label: "About", id: "about" },
-    { label: "Skills", id: "skills" },
-    { label: "Projects", id: "projects" },
-    { label: "Resume", id: "resume" },
-    { label: "Contact", id: "contact" },
-  ];
+  const linkClass = (id) =>
+    `font-medium transition-colors hover:text-accent ${
+      active === id ? "text-accent" : "text-foreground"
+    }`;
 
   return (
-    <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/95 backdrop-blur-sm shadow-md" : "bg-transparent"
-      }`}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <button 
-            onClick={() => scrollToSection("hero")}
-            className="font-display text-2xl font-bold text-primary hover:text-accent transition-colors"
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/85 backdrop-blur">
+      <nav aria-label="Primary" className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          <a
+            href="#hero"
+            aria-label="Back to top"
+            className="font-display text-2xl font-bold text-foreground transition-colors hover:text-accent"
           >
-            CC
-          </button>
+            {profile.initials}
+          </a>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className="text-foreground hover:text-accent transition-colors font-medium"
-              >
-                {item.label}
-              </button>
+          <ul className="hidden items-center gap-8 md:flex">
+            {sections.map((s) => (
+              <li key={s.id}>
+                <a
+                  href={`#${s.id}`}
+                  aria-current={active === s.id ? "true" : undefined}
+                  className={linkClass(s.id)}
+                >
+                  {s.label}
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
 
-          {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 hover:bg-accent/10 rounded-md transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            type="button"
+            className="rounded-md p-2 transition-colors hover:bg-accent/10 md:hidden"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMenuOpen((o) => !o)}
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className="block w-full text-left py-3 text-foreground hover:text-accent transition-colors font-medium"
-              >
-                {item.label}
-              </button>
+        {menuOpen && (
+          <ul id="mobile-menu" className="border-t border-border py-2 md:hidden">
+            {sections.map((s) => (
+              <li key={s.id}>
+                <a
+                  href={`#${s.id}`}
+                  onClick={() => setMenuOpen(false)}
+                  aria-current={active === s.id ? "true" : undefined}
+                  className={`block py-3 ${linkClass(s.id)}`}
+                >
+                  {s.label}
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
-      </div>
-    </nav>
+      </nav>
+
+      <div
+        aria-hidden="true"
+        className="h-0.5 origin-left bg-accent"
+        style={{ transform: `scaleX(${progress})` }}
+      />
+    </header>
   );
 };
 
