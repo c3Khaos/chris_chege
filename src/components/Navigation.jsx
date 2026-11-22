@@ -1,12 +1,35 @@
-import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
-import { profile, sections } from "../data/profile";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { FileText, FolderGit2, Home, Mail, User, Wrench } from "lucide-react";
+import { sections } from "../data/profile";
+import { prefersReducedMotion } from "../lib/utils";
+
+const ICONS = {
+  hero: Home,
+  about: User,
+  skills: Wrench,
+  projects: FolderGit2,
+  resume: FileText,
+  contact: Mail,
+};
+
+// Module-level so identities are stable across renders.
+const ITEMS = [{ id: "hero", label: "Home" }, ...sections];
+
+const isField = (el) => !!el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
+
+const SPRING = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
 const Navigation = ({ active }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const current = active ?? "hero";
   const [progress, setProgress] = useState(0);
+  const [hidden, setHidden] = useState(false);
 
-  // Scroll progress bar. rAF-throttled and passive so it never blocks scrolling.
+  const listRef = useRef(null);
+  const blobRef = useRef(null);
+  const itemRefs = useRef({});
+  const iconRefs = useRef({});
+
+  // Scroll progress. rAF-throttled and passive so it never blocks scrolling.
   useEffect(() => {
     let raf = 0;
     const update = () => {
@@ -25,94 +48,140 @@ const Navigation = ({ active }) => {
     };
   }, []);
 
-  // Escape closes the mobile menu.
+  // Slide away while a form field has focus, so the dock never sits on the keyboard.
   useEffect(() => {
-    if (!menuOpen) return undefined;
-    const onKey = (e) => e.key === "Escape" && setMenuOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
+    const onIn = (e) => isField(e.target) && setHidden(true);
+    const onOut = (e) => !isField(e.relatedTarget) && setHidden(false);
+    document.addEventListener("focusin", onIn);
+    document.addEventListener("focusout", onOut);
+    return () => {
+      document.removeEventListener("focusin", onIn);
+      document.removeEventListener("focusout", onOut);
+    };
+  }, []);
 
-  // Desktop link: dim by default, bright + accent underline when its section is in view.
-  const desktopLink = (id) =>
-    `relative inline-block py-1 font-medium transition-colors hover:text-white after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:rounded after:bg-accent after:transition-opacity motion-reduce:transition-none ${
-      active === id ? "text-white after:opacity-100" : "text-white/70 after:opacity-0"
-    }`;
+  // The glowing blob tracks the active item. The active item's label animates its
+  // width open, so we re-measure every frame for a moment instead of once. The blob's
+  // own CSS transition then chases the target, which is what gives it the springy feel.
+  useLayoutEffect(() => {
+    const sync = () => {
+      const el = itemRefs.current[current];
+      const blob = blobRef.current;
+      if (!el || !blob) return;
+      blob.style.width = `${el.offsetWidth}px`;
+      blob.style.transform = `translateX(${el.offsetLeft}px)`;
+    };
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now) => {
+      sync();
+      if (now - start < 700) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    window.addEventListener("resize", sync);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", sync);
+    };
+  }, [current]);
 
-  // Mobile link: full-width 48px tap target with an accent bar on the active row.
-  const mobileLink = (id) =>
-    `flex min-h-12 items-center border-l-2 px-3 text-base font-medium transition-colors motion-reduce:transition-none ${
-      active === id
-        ? "border-accent bg-white/5 text-white"
-        : "border-transparent text-white/70 hover:bg-white/5 hover:text-white"
-    }`;
+  // macOS-style magnification: icons grow and lift near the mouse. Mouse only.
+  const onPointerMove = (e) => {
+    if (e.pointerType !== "mouse" || prefersReducedMotion()) return;
+    ITEMS.forEach(({ id }) => {
+      const el = itemRefs.current[id];
+      const icon = iconRefs.current[id];
+      if (!el || !icon) return;
+      const r = el.getBoundingClientRect();
+      const d = e.clientX - (r.left + r.width / 2);
+      const s = 1 + 0.5 * Math.exp(-(d * d) / (2 * 52 * 52));
+      icon.style.transform = `translateY(${-(s - 1) * 16}px) scale(${s})`;
+    });
+  };
+  const resetIcons = () =>
+    ITEMS.forEach(({ id }) => {
+      const icon = iconRefs.current[id];
+      if (icon) icon.style.transform = "";
+    });
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 border-b border-white/10 text-white backdrop-blur-md transition-colors motion-reduce:transition-none ${
-        menuOpen ? "bg-primary shadow-xl" : "bg-primary/95"
-      }`}
+    <div
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-2"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 0.875rem)" }}
     >
-      <nav aria-label="Primary" className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <a
-            href="#hero"
-            aria-label="Back to top"
-            className="rounded font-display text-2xl font-bold text-white transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            {profile.initials}
-          </a>
+      <nav
+        aria-label="Primary"
+        className={`dock dock-in pointer-events-auto relative rounded-full border border-white/15 bg-primary/80 p-1.5 shadow-[0_18px_50px_-12px_rgb(0_0_0/0.65)] backdrop-blur-xl transition-transform duration-500 motion-reduce:transition-none ${
+          hidden ? "translate-y-[160%]" : "translate-y-0"
+        }`}
+        style={{ transitionTimingFunction: SPRING }}
+        onPointerMove={onPointerMove}
+        onPointerLeave={resetIcons}
+      >
+        <ul ref={listRef} className="relative flex items-center">
+          {/* sliding glow */}
+          <span
+            ref={blobRef}
+            aria-hidden="true"
+            className="absolute bottom-0 left-0 top-0 rounded-full bg-accent shadow-lg shadow-accent/50 transition-[transform,width] duration-500 motion-reduce:transition-none"
+            style={{ transitionTimingFunction: SPRING }}
+          />
 
-          <ul className="hidden items-center gap-8 md:flex">
-            {sections.map((s) => (
-              <li key={s.id}>
+          {ITEMS.map(({ id, label }) => {
+            const Icon = ICONS[id];
+            const isActive = current === id;
+            return (
+              <li key={id}>
                 <a
-                  href={`#${s.id}`}
-                  aria-current={active === s.id ? "true" : undefined}
-                  className={desktopLink(s.id)}
+                  ref={(el) => (itemRefs.current[id] = el)}
+                  href={`#${id}`}
+                  aria-label={label}
+                  aria-current={isActive ? "true" : undefined}
+                  className={`group relative z-10 flex h-11 items-center rounded-full px-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white motion-reduce:transition-none sm:px-3.5 ${
+                    isActive ? "text-white" : "text-white/60 hover:text-white"
+                  }`}
                 >
-                  {s.label}
+                  <span
+                    ref={(el) => (iconRefs.current[id] = el)}
+                    className="flex transition-transform duration-150 ease-out will-change-transform motion-reduce:transition-none"
+                  >
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+
+                  <span
+                    className={`overflow-hidden whitespace-nowrap text-xs font-semibold transition-[max-width,opacity,margin] duration-300 motion-reduce:transition-none sm:text-sm ${
+                      isActive ? "ml-1.5 max-w-20 opacity-100 sm:ml-2 sm:max-w-24" : "ml-0 max-w-0 opacity-0"
+                    }`}
+                  >
+                    {label}
+                  </span>
+
+                  {!isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute bottom-full left-1/2 mb-4 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
+                    >
+                      {label}
+                    </span>
+                  )}
                 </a>
               </li>
-            ))}
-          </ul>
+            );
+          })}
+        </ul>
 
-          <button
-            type="button"
-            className="-mr-2 flex h-11 w-11 items-center justify-center rounded-md text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            onClick={() => setMenuOpen((o) => !o)}
-          >
-            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+        {/* scroll progress, tucked into the bottom edge of the pill */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-6 bottom-[3px] h-[2px] overflow-hidden rounded-full bg-white/10"
+        >
+          <div
+            className="h-full origin-left rounded-full bg-white/70"
+            style={{ transform: `scaleX(${progress})` }}
+          />
         </div>
-
-        {menuOpen && (
-          <ul id="mobile-menu" className="border-t border-white/10 py-2 md:hidden">
-            {sections.map((s) => (
-              <li key={s.id}>
-                <a
-                  href={`#${s.id}`}
-                  onClick={() => setMenuOpen(false)}
-                  aria-current={active === s.id ? "true" : undefined}
-                  className={mobileLink(s.id)}
-                >
-                  {s.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
       </nav>
-
-      <div
-        aria-hidden="true"
-        className="h-0.5 origin-left bg-accent"
-        style={{ transform: `scaleX(${progress})` }}
-      />
-    </header>
+    </div>
   );
 };
 

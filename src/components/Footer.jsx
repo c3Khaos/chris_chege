@@ -2,7 +2,7 @@ import { ArrowUp } from "lucide-react";
 import { profile } from "../data/profile";
 
 const Footer = () => (
-  <footer className="bg-primary py-8 text-white">
+  <footer className="bg-primary pb-28 pt-8 text-white">
     <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 text-sm sm:flex-row">
       <p className="text-white/80">
         © {new Date().getFullYear()} {profile.name}

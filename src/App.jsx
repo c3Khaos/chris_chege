@@ -45,7 +45,7 @@ export default function App() {
         Skip to content
       </a>
 
-      <Navigation active={active === "hero" ? null : active} />
+      <Navigation active={active} />
 
       <main id="main">
         <Hero onGoto={scrollToId} onFilter={selectSkill} onOpen={openProject} />

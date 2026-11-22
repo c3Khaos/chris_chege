@@ -196,7 +196,7 @@ export const projectsUsing = (skill) =>
 
 // A typo in a stack entry silently breaks proof counts and filters, so always warn.
 const unknownTech = projects.flatMap((p) =>
-  p.stack.filter((s) => !knownSk ills.includes(s)).map((s) => `${p.id}: "${s}"`)
+  p.stack.filter((s) => !knownSkills.includes(s)).map((s) => `${p.id}: "${s}"`)
 );
 if (unknownTech.length) {
   console.warn("[profile] stack entries missing from skillGroups:", unknownTech);

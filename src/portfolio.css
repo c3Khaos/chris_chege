@@ -2,7 +2,46 @@
 
 /* Smooth scrolling only for people who haven't asked for less motion. */
 html {
-  scroll-padding-top: 4.5rem; /* clears the fixed nav for #anchor jumps */
+  scroll-padding-top: 1rem; /* the nav is a bottom dock now, nothing covers the top */
+}
+
+/* Floating dock (see Navigation.jsx) */
+.dock-in {
+  animation: dock-in 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.25) 0.5s backwards;
+}
+@keyframes dock-in {
+  from {
+    opacity: 0;
+    transform: translateY(140%) scale(0.7);
+  }
+  60% {
+    opacity: 1;
+  }
+}
+/* A slow sheen sweeping across the glass */
+.dock::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.12) 46%, transparent 62%);
+  background-size: 250% 100%;
+  animation: dock-sheen 7s linear infinite;
+}
+@keyframes dock-sheen {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dock-in,
+  .dock::after {
+    animation: none;
+  }
 }
 @media (prefers-reduced-motion: no-preference) {
   html {
