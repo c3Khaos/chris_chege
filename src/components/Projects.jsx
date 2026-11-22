@@ -1,9 +1,10 @@
-import { ChevronDown, ExternalLink } from "lucide-react";
+import { ChevronDown, ExternalLink, Lock } from "lucide-react";
 import { GithubIcon } from "./BrandIcons";
 import Reveal from "./Reveal";
 import Chip from "./Chip";
 import TodoText from "./TodoText";
 import { projects, knownSkills, projectsUsing } from "../data/profile";
+import { IS_PROD, publicText } from "../lib/utils";
 
 const FIELDS = [
   ["problem", "Problem"],
@@ -21,9 +22,15 @@ const Placeholder = ({ label }) => (
     className="flex aspect-video flex-col items-center justify-center gap-1 bg-gradient-to-br from-accent/20 to-secondary"
   >
     <span className="font-mono text-4xl font-bold text-accent">{label}</span>
-    <span className="text-xs text-muted-foreground">screenshot goes here</span>
+    {!IS_PROD && (
+      <span className="text-xs text-muted-foreground">screenshot goes here</span>
+    )}
   </div>
 );
+
+// Live site: only rows that have real copy. Dev: every row, so gaps stay visible.
+const caseFields = (data) =>
+  FIELDS.filter(([key]) => !IS_PROD || publicText(data[key]));
 
 const CaseStudy = ({ id, data, open }) => (
   <div
@@ -35,7 +42,7 @@ const CaseStudy = ({ id, data, open }) => (
   >
     <div className="overflow-hidden">
       <dl className="mt-4 space-y-3 border-t border-border pt-4 text-sm">
-        {FIELDS.map(([key, label]) => (
+        {caseFields(data).map(([key, label]) => (
           <div key={key}>
             <dt className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {label}
@@ -98,6 +105,15 @@ const ProjectCard = ({ project, activeSkill, onSkillChange, open, onToggle }) =>
             <GithubIcon className="h-4 w-4" /> Code
           </a>
         )}
+        {!project.repo && project.private && (
+          <a
+            href="#contact"
+            aria-label={`${project.title} source is private. Ask for a code walkthrough.`}
+            className="inline-flex items-center gap-1.5 font-medium text-muted-foreground hover:text-accent hover:underline"
+          >
+            <Lock className="h-4 w-4" aria-hidden="true" /> Private repo: ask for a walkthrough
+          </a>
+        )}
         {project.live && (
           <a
             href={project.live}
@@ -109,6 +125,7 @@ const ProjectCard = ({ project, activeSkill, onSkillChange, open, onToggle }) =>
             <ExternalLink className="h-4 w-4" /> Live demo
           </a>
         )}
+        {caseFields(project.caseStudy).length > 0 && (
         <button
           type="button"
           onClick={onToggle}
@@ -123,6 +140,7 @@ const ProjectCard = ({ project, activeSkill, onSkillChange, open, onToggle }) =>
             }`}
           />
         </button>
+        )}
       </div>
 
       <CaseStudy id={project.id} data={project.caseStudy} open={open} />

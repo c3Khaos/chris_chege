@@ -1,9 +1,13 @@
-import { isTodo } from "../lib/utils";
+import { IS_PROD, isTodo, publicText } from "../lib/utils";
 
 // Real copy renders normally. From a "TODO:" marker onward, the text becomes an
-// amber-badged prompt, so half-finished copy shows exactly where the gap is and
-// can't slip into production unnoticed.
+// amber-badged prompt in dev, so half-finished copy shows exactly where the gap is.
+// In a production build the TODO part is never rendered: visitors only see real copy.
 const TodoText = ({ text, className = "" }) => {
+  if (IS_PROD) {
+    const real = publicText(text);
+    return real ? <span className={className}>{real}</span> : null;
+  }
   if (!isTodo(text)) return <span className={className}>{text}</span>;
 
   const source = text || "";
