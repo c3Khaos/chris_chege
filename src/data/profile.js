@@ -27,6 +27,13 @@ export const profile = {
   resume: { href: "/chris_Resume.pdf", filename: "Chege_Resume.pdf" },
 };
 
+// Proof strip under the hero buttons. Facts only, nothing aspirational.
+export const proof = [
+  { label: "Live", detail: "POS used by a real client in Nairobi" },
+  { label: "Payments", detail: "Safaricom STK push and C2B" },
+  { label: "Stack", detail: "React, Flask, SQLAlchemy" },
+];
+
 // Order here = order on the page = order of the nav.
 export const sections = [
   { id: "about", label: "About" },
@@ -48,7 +55,7 @@ export const story = [
     id: "broke",
     label: "What broke",
     title: "The thing that broke",
-    body: "My failure was integrating payments: connecting the POS to Safaricom (STK push and C2B) and Kopo Kopo merchants. On localhost I used ngrok to expose my callback URL, and at one point I got duplicate payments. I fixed it by giving every sale a unique random UUID. TODO: Why did the duplicate happen? (Did the same callback arrive twice? A retry? A double tap?) Say what you found, not what you guessed.",
+    body: "My failure was integrating payments: connecting the POS to Safaricom (STK push and C2B) and Kopo Kopo merchants. During early testing I used ngrok to expose my callback URL from localhost. At one point I got duplicate payments, and I fixed it by giving every sale a unique random UUID. TODO: Why did the duplicate happen? (Did the same callback arrive twice? A retry? A double tap?) Say what you found, not what you guessed.",
   },
   {
     id: "learned",

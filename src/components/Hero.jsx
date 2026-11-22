@@ -1,12 +1,12 @@
 import Button from "./Button";
 import Terminal from "./Terminal";
-import { profile } from "../data/profile";
+import { profile, proof } from "../data/profile";
 
 const Hero = ({ onGoto, onFilter, onOpen }) => (
   <section id="hero" className="relative isolate overflow-hidden bg-primary text-white">
     <div className="bg-grid absolute inset-0 -z-10" aria-hidden="true" />
 
-    <div className="container mx-auto grid min-h-screen items-center gap-12 px-4 pb-20 pt-28 lg:grid-cols-2">
+    <div className="container mx-auto grid min-h-screen items-center gap-12 px-4 pb-32 pt-16 lg:grid-cols-2 lg:gap-16">
       <div className="animate-fade-in motion-reduce:animate-none">
         <p className="mb-4 font-mono text-sm tracking-wide text-accent">
           {profile.role.toLowerCase()}
@@ -26,6 +26,17 @@ const Hero = ({ onGoto, onFilter, onOpen }) => (
             Get in touch
           </Button>
         </div>
+
+        <dl className="mt-12 grid max-w-xl gap-5 border-t border-white/10 pt-6 sm:grid-cols-3">
+          {proof.map(({ label, detail }) => (
+            <div key={label}>
+              <dt className="mb-1 font-mono text-xs uppercase tracking-wide text-accent">
+                {label}
+              </dt>
+              <dd className="text-sm text-white/80">{detail}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
 
       <div>

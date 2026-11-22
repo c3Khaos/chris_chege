@@ -13,6 +13,14 @@ const lineStyle = {
   err: "text-red-400",
 };
 
+// What the terminal shows on load, so it is never an empty box.
+const introLines = (handlers) => [
+  { kind: "cmd", text: "whoami" },
+  ...runCommand("whoami", handlers),
+  { kind: "cmd", text: "projects" },
+  ...runCommand("projects", handlers),
+];
+
 const Terminal = ({ onGoto, onFilter, onOpen }) => {
   const [lines, setLines] = useState([]);
   const [input, setInput] = useState("");
@@ -58,7 +66,7 @@ const Terminal = ({ onGoto, onFilter, onOpen }) => {
     if (prefersReducedMotion()) {
       autoRef.current = false;
       setTyping(false);
-      setLines([{ kind: "cmd", text: word }, ...runCommand(word, handlers)]);
+      setLines(introLines(handlers));
       return undefined;
     }
 
@@ -76,7 +84,7 @@ const Terminal = ({ onGoto, onFilter, onOpen }) => {
           autoRef.current = false;
           setTyping(false);
           setInput("");
-          setLines([{ kind: "cmd", text: word }, ...runCommand(word, handlers)]);
+          setLines(introLines(handlers));
         }, 350);
       }
     };
