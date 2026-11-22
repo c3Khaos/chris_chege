@@ -41,7 +41,7 @@ const Highlight = ({ text }) =>
     if (part.startsWith("'") && part.endsWith("'"))
       return <span key={i} className="text-amber-300">{part}</span>;
     if (/^\d+$/.test(part))
-      return <span key={i} className="font-bold text-accent">{part}</span>;
+      return <span key={i} className="font-bold text-tile-sky">{part}</span>;
     return part;
   });
 
@@ -49,7 +49,7 @@ const Prompt = () => (
   <span className="mr-2 select-none">
     <span className="text-emerald-400">guest</span>
     <span className="text-neutral-500">@</span>
-    <span className="text-accent">nairobi</span>
+    <span className="text-tile-sky">nairobi</span>
     <span className="text-neutral-500">:~$</span>
   </span>
 );
@@ -229,14 +229,14 @@ const Terminal = ({ onGoto, onFilter, onOpen }) => {
   return (
     <div
       onPointerMove={onPointerMove}
-      className="term-glow term-scan group/term relative overflow-hidden rounded-xl border border-accent/30 bg-neutral-950 text-left font-mono text-sm"
+      className="term-scan group/term relative overflow-hidden rounded-2xl border-2 border-foreground bg-neutral-950 shadow-[6px_6px_0_0_var(--foreground)] text-left font-mono text-sm"
     >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-60 transition-opacity duration-300 group-hover/term:opacity-100"
         style={{
           background:
-            "radial-gradient(420px circle at var(--mx, 50%) var(--my, 25%), color-mix(in oklab, var(--accent) 18%, transparent), transparent 60%)",
+            "radial-gradient(420px circle at var(--mx, 50%) var(--my, 25%), color-mix(in oklab, var(--accent) 35%, transparent), transparent 60%)",
         }}
       />
 
@@ -295,7 +295,7 @@ const Terminal = ({ onGoto, onFilter, onOpen }) => {
             autoCorrect="off"
             spellCheck={false}
             placeholder={typing || busy ? "" : "type a command"}
-            className="min-w-0 flex-1 bg-transparent text-base text-neutral-100 caret-accent outline-none placeholder:text-neutral-600 md:text-sm"
+            className="min-w-0 flex-1 bg-transparent text-base text-neutral-100 caret-tile-sky outline-none placeholder:text-neutral-600 md:text-sm"
           />
         </form>
       </div>
@@ -311,7 +311,7 @@ const Terminal = ({ onGoto, onFilter, onOpen }) => {
               stopAuto();
               execute(cmd);
             }}
-            className="rounded border border-white/15 px-2 py-1 text-xs text-neutral-300 transition-all hover:-translate-y-0.5 hover:border-accent hover:text-accent hover:shadow-[0_0_14px_-2px] hover:shadow-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+            className="rounded border border-white/15 px-2 py-1 text-xs text-neutral-300 transition-all hover:-translate-y-0.5 hover:border-tile-sky hover:text-tile-sky hover:shadow-[0_0_14px_-2px] hover:shadow-tile-sky focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tile-sky motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
             {cmd}
           </button>

@@ -111,7 +111,7 @@ const Navigation = ({ active }) => {
     >
       <nav
         aria-label="Primary"
-        className={`dock dock-in pointer-events-auto relative rounded-full border border-white/15 bg-primary/80 p-1.5 shadow-[0_18px_50px_-12px_rgb(0_0_0/0.65)] backdrop-blur-xl transition-transform duration-500 motion-reduce:transition-none ${
+        className={`dock dock-in pointer-events-auto relative rounded-full border-2 border-foreground bg-card p-1.5 shadow-[4px_4px_0_0_var(--foreground)] transition-transform duration-500 motion-reduce:transition-none ${
           hidden ? "translate-y-[160%]" : "translate-y-0"
         }`}
         style={{ transitionTimingFunction: SPRING }}
@@ -123,7 +123,7 @@ const Navigation = ({ active }) => {
           <span
             ref={blobRef}
             aria-hidden="true"
-            className="absolute bottom-0 left-0 top-0 rounded-full bg-accent shadow-lg shadow-accent/50 transition-[transform,width] duration-500 motion-reduce:transition-none"
+            className="absolute bottom-0 left-0 top-0 rounded-full bg-foreground transition-[transform,width] duration-500 motion-reduce:transition-none"
             style={{ transitionTimingFunction: SPRING }}
           />
 
@@ -137,8 +137,8 @@ const Navigation = ({ active }) => {
                   href={`#${id}`}
                   aria-label={label}
                   aria-current={isActive ? "true" : undefined}
-                  className={`group relative z-10 flex h-11 items-center rounded-full px-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white motion-reduce:transition-none sm:px-3.5 ${
-                    isActive ? "text-white" : "text-white/60 hover:text-white"
+                  className={`group relative z-10 flex h-11 items-center rounded-full px-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none sm:px-3.5 ${
+                    isActive ? "text-background" : "text-foreground/65 hover:text-foreground"
                   }`}
                 >
                   <span
@@ -159,7 +159,7 @@ const Navigation = ({ active }) => {
                   {!isActive && (
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none absolute bottom-full left-1/2 mb-4 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
+                      className="pointer-events-none absolute bottom-full left-1/2 mb-4 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-semibold text-background opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100"
                     >
                       {label}
                     </span>
@@ -173,10 +173,10 @@ const Navigation = ({ active }) => {
         {/* scroll progress, tucked into the bottom edge of the pill */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-6 bottom-[3px] h-[2px] overflow-hidden rounded-full bg-white/10"
+          className="pointer-events-none absolute inset-x-6 bottom-[3px] h-[2px] overflow-hidden rounded-full bg-foreground/15"
         >
           <div
-            className="h-full origin-left rounded-full bg-white/70"
+            className="h-full origin-left rounded-full bg-accent"
             style={{ transform: `scaleX(${progress})` }}
           />
         </div>

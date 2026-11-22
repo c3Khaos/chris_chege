@@ -2,6 +2,7 @@ import { ChevronDown, ExternalLink, Lock } from "lucide-react";
 import { GithubIcon } from "./BrandIcons";
 import Reveal from "./Reveal";
 import Chip from "./Chip";
+import SectionHead from "./SectionHead";
 import TodoText from "./TodoText";
 import { projects, knownSkills, projectsUsing } from "../data/profile";
 import { IS_PROD, publicText } from "../lib/utils";
@@ -16,17 +17,45 @@ const FIELDS = [
 // Only offer filters that actually match something.
 const filterSkills = knownSkills.filter((s) => projectsUsing(s).length > 0);
 
-const Placeholder = ({ label }) => (
-  <div
-    aria-hidden="true"
-    className="flex aspect-video flex-col items-center justify-center gap-1 bg-gradient-to-br from-accent/20 to-secondary"
-  >
-    <span className="font-mono text-4xl font-bold text-accent">{label}</span>
-    {!IS_PROD && (
-      <span className="text-xs text-muted-foreground">screenshot goes here</span>
-    )}
-  </div>
-);
+const TILES = ["bg-tile-amber", "bg-tile-pink", "bg-tile-sky", "bg-tile-lime"];
+const tileFor = (id) => TILES[Math.max(0, projects.findIndex((p) => p.id === id)) % TILES.length];
+
+// The coloured tile on top of every card. With a screenshot it sits in a browser frame;
+// without one, the monogram carries the tile on its own (no fake "screenshot goes here" box in prod).
+const Tile = ({ project }) => {
+  const n = String(projects.findIndex((p) => p.id === project.id) + 1).padStart(2, "0");
+  return (
+    <div className={`relative border-b-2 border-foreground p-5 ${tileFor(project.id)}`}>
+      <span className="absolute left-5 top-4 font-mono text-xs font-bold">{n}</span>
+      {project.image ? (
+        <div className="brut-sm mt-5 overflow-hidden rounded-xl bg-card">
+          <div className="flex gap-1.5 border-b-2 border-foreground px-3 py-2" aria-hidden="true">
+            <span className="h-2.5 w-2.5 rounded-full border border-foreground" />
+            <span className="h-2.5 w-2.5 rounded-full border border-foreground" />
+            <span className="h-2.5 w-2.5 rounded-full border border-foreground" />
+          </div>
+          <img
+            src={project.image}
+            alt={`${project.title} screenshot`}
+            width={800}
+            height={450}
+            loading="lazy"
+            className="aspect-video w-full object-cover"
+          />
+        </div>
+      ) : (
+        <div aria-hidden="true" className="flex aspect-video flex-col items-center justify-center">
+          <span className="font-display text-7xl font-extrabold tracking-tighter md:text-8xl">
+            {project.monogram}
+          </span>
+          {!IS_PROD && (
+            <span className="mt-2 font-mono text-xs font-bold">screenshot goes here</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Live site: only rows that have real copy. Dev: every row, so gaps stay visible.
 const caseFields = (data) =>
@@ -41,10 +70,10 @@ const CaseStudy = ({ id, data, open }) => (
     }`}
   >
     <div className="overflow-hidden">
-      <dl className="mt-4 space-y-3 border-t border-border pt-4 text-sm">
+      <dl className="mt-4 space-y-3 border-t-2 border-foreground/15 pt-4 text-sm">
         {caseFields(data).map(([key, label]) => (
           <div key={key}>
-            <dt className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <dt className="mb-0.5 font-mono text-xs font-bold uppercase tracking-widest text-accent">
               {label}
             </dt>
             <dd className="text-card-foreground">
@@ -60,24 +89,13 @@ const CaseStudy = ({ id, data, open }) => (
 const ProjectCard = ({ project, activeSkill, onSkillChange, open, onToggle }) => (
   <article
     id={`project-${project.id}`}
-    className="flex h-full flex-col overflow-hidden rounded-lg bg-card shadow-lg transition-shadow duration-300 hover:shadow-xl motion-reduce:transition-none"
+    className="brut flex h-full flex-col overflow-hidden rounded-3xl bg-card"
   >
-    {project.image ? (
-      <img
-        src={project.image}
-        alt={`${project.title} screenshot`}
-        width={800}
-        height={450}
-        loading="lazy"
-        className="aspect-video w-full object-cover"
-      />
-    ) : (
-      <Placeholder label={project.monogram} />
-    )}
+    <Tile project={project} />
 
     <div className="flex flex-1 flex-col p-6">
-      <h3 className="mb-2 text-xl font-semibold text-card-foreground">{project.title}</h3>
-      <p className="mb-4 text-sm text-muted-foreground">{project.summary}</p>
+      <h3 className="mb-2 font-display text-2xl font-extrabold tracking-tight text-card-foreground">{project.title}</h3>
+      <p className="mb-4 text-muted-foreground">{project.summary}</p>
 
       <ul className="mb-4 flex flex-wrap gap-2" aria-label={`${project.title} tech stack`}>
         {project.stack.map((tech) => (
@@ -100,7 +118,7 @@ const ProjectCard = ({ project, activeSkill, onSkillChange, open, onToggle }) =>
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${project.title} source code on GitHub`}
-            className="inline-flex items-center gap-1.5 font-medium text-accent hover:underline"
+            className="inline-flex items-center gap-1.5 font-bold text-accent hover:underline"
           >
             <GithubIcon className="h-4 w-4" /> Code
           </a>
@@ -109,7 +127,7 @@ const ProjectCard = ({ project, activeSkill, onSkillChange, open, onToggle }) =>
           <a
             href="#contact"
             aria-label={`${project.title} source is private. Ask for a code walkthrough.`}
-            className="inline-flex items-center gap-1.5 font-medium text-muted-foreground hover:text-accent hover:underline"
+            className="inline-flex items-center gap-1.5 font-semibold text-muted-foreground hover:text-accent hover:underline"
           >
             <Lock className="h-4 w-4" aria-hidden="true" /> Private repo: ask for a walkthrough
           </a>
@@ -120,7 +138,7 @@ const ProjectCard = ({ project, activeSkill, onSkillChange, open, onToggle }) =>
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${project.title} live demo`}
-            className="inline-flex items-center gap-1.5 font-medium text-accent hover:underline"
+            className="inline-flex items-center gap-1.5 font-bold text-accent hover:underline"
           >
             <ExternalLink className="h-4 w-4" /> Live demo
           </a>
@@ -131,7 +149,7 @@ const ProjectCard = ({ project, activeSkill, onSkillChange, open, onToggle }) =>
           onClick={onToggle}
           aria-expanded={open}
           aria-controls={`${project.id}-case`}
-          className="ml-auto inline-flex items-center gap-1 rounded font-medium text-card-foreground transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="ml-auto inline-flex items-center gap-1 rounded font-bold text-card-foreground transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           Case study
           <ChevronDown
@@ -152,23 +170,18 @@ const Projects = ({ activeSkill, onSkillChange, openId, onOpenChange }) => {
   const visible = activeSkill ? projectsUsing(activeSkill) : projects;
 
   return (
-    <section id="projects" className="bg-secondary py-24">
+    <section id="projects" className="py-24">
       <div className="container mx-auto px-4">
-        <div className="mx-auto max-w-5xl">
-          <Reveal>
-            <h2 className="mb-6 text-center font-display text-4xl font-bold text-foreground md:text-5xl">
-              Projects
-            </h2>
-            <p className="mx-auto mb-10 max-w-2xl text-center text-lg text-muted-foreground">
-              Every card opens into the decisions behind it. Filter by skill to see what
-              actually backs a claim.
-            </p>
-          </Reveal>
+        <div className="mx-auto max-w-6xl">
+          <SectionHead kicker="03 / Projects" title="Work, and the decisions behind it.">
+            Every card opens into the problem, the decision and the tradeoff. Filter by
+            skill to see what actually backs a claim.
+          </SectionHead>
 
           <div
             role="group"
             aria-label="Filter projects by skill"
-            className="mb-4 flex flex-wrap justify-center gap-2"
+            className="mb-4 flex flex-wrap gap-3"
           >
             <Chip active={!activeSkill} onClick={() => onSkillChange(null)}>
               All
@@ -187,7 +200,7 @@ const Projects = ({ activeSkill, onSkillChange, openId, onOpenChange }) => {
 
           <p
             aria-live="polite"
-            className="mb-8 text-center text-sm text-muted-foreground"
+            className="mb-8 mt-6 font-mono text-xs text-muted-foreground"
           >
             Showing {visible.length} of {projects.length}
             {activeSkill && (
@@ -198,7 +211,7 @@ const Projects = ({ activeSkill, onSkillChange, openId, onOpenChange }) => {
             )}
           </p>
 
-          <ul className="grid gap-8 md:grid-cols-2">
+          <ul className="grid gap-10 md:grid-cols-2">
             {visible.map((project, i) => (
               <Reveal as="li" key={project.id} delay={i * 80}>
                 <ProjectCard

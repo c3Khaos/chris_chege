@@ -3,6 +3,7 @@ import { Check, Copy, Mail, Send } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "./BrandIcons";
 import Reveal from "./Reveal";
 import Button from "./Button";
+import SectionHead from "./SectionHead";
 import { profile } from "../data/profile";
 
 const socials = [
@@ -23,8 +24,10 @@ const socials = [
   },
 ];
 
+const SOCIAL_TILES = ["bg-tile-amber", "bg-tile-sky", "bg-tile-pink"];
+
 const inputClass =
-  "w-full rounded-lg border border-border bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent";
+  "w-full rounded-xl border-2 border-foreground bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-card";
 
 const Contacts = () => {
   const [status, setStatus] = useState(null); // null | "copied" | "failed"
@@ -56,34 +59,29 @@ const Contacts = () => {
   };
 
   return (
-    <section id="contact" className="bg-secondary py-24">
+    <section id="contact" className="py-24">
       <div className="container mx-auto px-4">
-        <div className="mx-auto max-w-4xl">
-          <Reveal>
-            <h2 className="mb-6 text-center font-display text-4xl font-bold text-foreground md:text-5xl">
-              Let's talk
-            </h2>
-            <p className="mx-auto mb-12 max-w-2xl text-center text-lg text-muted-foreground">
-              Hiring for a junior role, need a freelance build, or want to talk code?
-              Email is the fastest way to reach me.
-            </p>
-          </Reveal>
+        <div className="mx-auto max-w-5xl">
+          <SectionHead kicker="05 / Contact" title="Let's build yours.">
+            Need a system for your business, hiring for a junior role, or want to talk
+            code? Email is the fastest way to reach me.
+          </SectionHead>
 
-          <Reveal className="grid gap-10 rounded-lg bg-card p-8 shadow-xl md:grid-cols-2">
+          <Reveal className="grid gap-10 brut rounded-3xl bg-card p-8 md:grid-cols-2 md:p-10">
             <div>
               <ul className="space-y-2">
-                {socials.map(({ icon: Icon, label, value, href, external }) => (
+                {socials.map(({ icon: Icon, label, value, href, external }, i) => (
                   <li key={label}>
                     <a
                       href={href}
                       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      className="group flex items-center gap-4 rounded-lg p-3 transition-colors hover:bg-secondary"
+                      className="group flex items-center gap-4 rounded-2xl p-3 transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     >
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10 transition-colors group-hover:bg-accent/20">
-                        <Icon className="h-6 w-6 text-accent" aria-hidden="true" />
+                      <span className={`brut-sm flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${SOCIAL_TILES[i % SOCIAL_TILES.length]}`}>
+                        <Icon className="h-6 w-6 text-foreground" aria-hidden="true" />
                       </span>
                       <span className="min-w-0">
-                        <span className="block text-sm font-semibold text-muted-foreground">
+                        <span className="block font-mono text-xs font-bold uppercase tracking-widest text-muted-foreground">
                           {label}
                         </span>
                         <span className="block truncate text-sm text-card-foreground">
@@ -113,7 +111,7 @@ const Contacts = () => {
 
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
-                <label htmlFor="contact-name" className="mb-1 block text-sm font-semibold text-card-foreground">
+                <label htmlFor="contact-name" className="mb-1.5 block text-sm font-bold text-card-foreground">
                   Your name
                 </label>
                 <input
@@ -129,7 +127,7 @@ const Contacts = () => {
                 />
               </div>
               <div>
-                <label htmlFor="contact-message" className="mb-1 block text-sm font-semibold text-card-foreground">
+                <label htmlFor="contact-message" className="mb-1.5 block text-sm font-bold text-card-foreground">
                   What do you need?
                 </label>
                 <textarea

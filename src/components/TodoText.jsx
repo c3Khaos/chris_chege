@@ -19,10 +19,10 @@ const TodoText = ({ text, className = "" }) => {
   return (
     <span className={className}>
       {done && <>{done} </>}
-      <span className="mr-2 rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-600">
+      <span className="mr-2 rounded bg-foreground px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-background">
         Todo
       </span>
-      <span className="italic text-muted-foreground">{prompt}</span>
+      <span className="italic text-foreground/70">{prompt}</span>
     </span>
   );
 };

@@ -1,7 +1,11 @@
 import { useRef, useState } from "react";
 import Reveal from "./Reveal";
+import SectionHead from "./SectionHead";
 import TodoText from "./TodoText";
 import { profile, story } from "../data/profile";
+
+// One flat tile colour per story step.
+const STORY_TILES = ["bg-tile-sky", "bg-tile-pink", "bg-tile-lime"];
 
 const About = () => {
   const [index, setIndex] = useState(0);
@@ -22,25 +26,20 @@ const About = () => {
   };
 
   return (
-    <section id="about" className="bg-secondary py-24">
+    <section id="about" className="py-24">
       <div className="container mx-auto px-4">
-        <div className="mx-auto max-w-4xl">
-          <Reveal>
-            <h2 className="mb-6 text-center font-display text-4xl font-bold text-foreground md:text-5xl">
-              About
-            </h2>
-            <p className="mx-auto mb-12 max-w-2xl text-center text-lg text-muted-foreground">
-              {profile.aboutIntro}
-            </p>
-          </Reveal>
+        <div className="mx-auto max-w-5xl">
+          <SectionHead kicker="01 / About" title="Learned it the hard way.">
+            {profile.aboutIntro}
+          </SectionHead>
 
-          <Reveal className="grid gap-6 md:grid-cols-[14rem_1fr]">
+          <Reveal className="grid gap-6 md:grid-cols-[15rem_1fr]">
             <div
               role="tablist"
               aria-orientation="vertical"
               aria-label="My story"
               onKeyDown={onKeyDown}
-              className="flex gap-2 md:flex-col"
+              className="flex gap-3 md:flex-col"
             >
               {story.map((step, i) => (
                 <button
@@ -53,11 +52,10 @@ const About = () => {
                   aria-controls="story-panel"
                   tabIndex={i === index ? 0 : -1}
                   onClick={() => setIndex(i)}
-                  className={`flex-1 rounded-lg px-4 py-3 text-left text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent motion-reduce:transition-none md:flex-none ${
-                    i === index
-                      ? "bg-accent text-white shadow-lg"
-                      : "bg-card text-card-foreground hover:text-accent"
+                  className={`brut-chip flex-1 rounded-2xl px-4 py-3 text-left text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background md:flex-none ${
+                    i === index ? "bg-foreground text-background" : "bg-card text-card-foreground"
                   }`}
+                  style={i === index ? { transform: "translate(2px, 2px)", boxShadow: "none" } : undefined}
                 >
                   <span className="mr-2 font-mono opacity-70">0{i + 1}</span>
                   {step.label}
@@ -70,12 +68,12 @@ const About = () => {
               id="story-panel"
               aria-labelledby={`story-tab-${index}`}
               tabIndex={0}
-              className="rounded-lg bg-card p-8 shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className={`brut rounded-3xl p-8 text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background md:p-10 ${STORY_TILES[index % STORY_TILES.length]}`}
             >
-              <h3 className="mb-4 font-display text-2xl font-semibold text-card-foreground">
+              <h3 className="mb-4 font-display text-3xl font-extrabold tracking-tight">
                 {current.title}
               </h3>
-              <p className="text-lg leading-relaxed text-card-foreground">
+              <p className="text-lg leading-relaxed">
                 <TodoText text={current.body} />
               </p>
             </div>

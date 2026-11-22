@@ -5,19 +5,7 @@ html {
   scroll-padding-top: 1rem; /* the nav is a bottom dock now, nothing covers the top */
 }
 
-/* Hero terminal (see Terminal.jsx): breathing glow and faint scanlines */
-.term-glow {
-  animation: term-glow 5s ease-in-out infinite;
-}
-@keyframes term-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 40px -12px color-mix(in oklab, var(--accent) 45%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 80px -8px color-mix(in oklab, var(--accent) 75%, transparent);
-  }
-}
+/* Hero terminal (see Terminal.jsx): faint scanlines */
 .term-scan::after {
   content: "";
   position: absolute;
@@ -29,9 +17,53 @@ html {
     transparent 1px 3px
   );
 }
+
+/* Hard-shadow system: 2px ink border + solid offset shadow, no blur, ever. */
+.brut {
+  border: 2px solid var(--foreground);
+  box-shadow: 4px 4px 0 0 var(--foreground);
+}
+.brut-sm {
+  border: 2px solid var(--foreground);
+  box-shadow: 3px 3px 0 0 var(--foreground);
+}
+/* Buttons: lift on hover, press flat on click. */
+.brut-hover {
+  border: 2px solid var(--foreground);
+  box-shadow: 4px 4px 0 0 var(--foreground);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.brut-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 0 var(--foreground);
+}
+.brut-hover:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 0 var(--foreground);
+}
+/* Chips: smaller, and a pressed chip (aria-pressed) sits flat. */
+.brut-chip {
+  border: 2px solid var(--foreground);
+  box-shadow: 2px 2px 0 0 var(--foreground);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+.brut-chip:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 0 var(--foreground);
+}
+.brut-chip[aria-pressed="true"] {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 0 var(--foreground);
+}
 @media (prefers-reduced-motion: reduce) {
-  .term-glow {
-    animation: none;
+  .brut-hover,
+  .brut-chip {
+    transition: none;
+  }
+  .brut-hover:hover,
+  .brut-hover:active,
+  .brut-chip:hover {
+    transform: none;
   }
 }
 
@@ -48,28 +80,8 @@ html {
     opacity: 1;
   }
 }
-/* A slow sheen sweeping across the glass */
-.dock::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.12) 46%, transparent 62%);
-  background-size: 250% 100%;
-  animation: dock-sheen 7s linear infinite;
-}
-@keyframes dock-sheen {
-  from {
-    background-position: 150% 0;
-  }
-  to {
-    background-position: -100% 0;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
-  .dock-in,
-  .dock::after {
+  .dock-in {
     animation: none;
   }
 }
@@ -95,14 +107,4 @@ html {
     transform: none;
     transition: none;
   }
-}
-
-/* Hero grid backdrop, replaces the stock photo */
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  -webkit-mask-image: radial-gradient(ellipse at center, black 35%, transparent 75%);
-  mask-image: radial-gradient(ellipse at center, black 35%, transparent 75%);
 }
